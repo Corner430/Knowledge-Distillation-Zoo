@@ -1,5 +1,5 @@
 from .logits import Logits
-from .st import SoftTarget
+from .st import SoftTarget, SoftTarget1, SoftTarget2, SoftTarget3
 from .at import AT
 from .fitnet import Hint
 from .nst import NST
@@ -7,7 +7,7 @@ from .pkt import PKTCosSim
 from .fsp import FSP
 from .ft import FT
 from .dml import DML
-from .kdsvd import KDSVD
+# from .kdsvd import KDSVD
 from .rkd import RKD
 from .ab import AB
 from .sp import SP
