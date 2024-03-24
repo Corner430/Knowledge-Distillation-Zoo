@@ -649,3 +649,15 @@ This repo is partly based on the following repos, thank the authors a lot.
 - [lenscloth/RKD](https://github.com/lenscloth/RKD)
 
 If you employ the listed KD methods in your research, please cite the corresponding papers.
+
+## 论文讲解
+- [ST: Distilling the Knowledge in a Neural Network](https://github.com/corner430/Knowledge-Distillation-Zoo/tree/master/paper/Distilling-the-Knowledge-in-a-Neural-Network.md)
+    - $L_{soft}$ 可是看作是一种正则，使得模型减少过拟合
+    - 知识蒸馏和直接从头训练区别在哪？
+        - 收敛的形式不一样，大模型的隐藏层比较复杂，搜索的空间比较大，收敛的位置更平滑，也就是得到的解空间更优美。让大模型指导小模型，能让二者的解空间尽量逼近，收敛的位置尽量接近。**说句专业的话，就是让二者的模型参数之间的散度尽量小。**
+    - **`distill`时候的学习率要给大一些**
+    - 调节合适的温度。通常取 [1, 2, 5, 10]，2最好
+    - 对于大模型使用一定的方式，加快收敛速度
+    - **对于 $L_{soft}$ 的相对权重，可以通过打印中间梯度来确定一下，这个超参非常重要。**
+    - **可以动态调整学习率**
+    - 可以避免 teacher 的错误，或者当无法 match teacher 的输出时，可以避免 student 的错误
