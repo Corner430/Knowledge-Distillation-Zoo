@@ -1,0 +1,36 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "base-c100-r20",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--save_root", "./results/base/",
+                "--data_name", "cifar100",
+                "--num_class", "100",
+                "--net_name", "resnet20",
+                "--note", "base-c100-r20"
+            ]
+        },
+        {
+            "name": "base-c100-r110",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--save_root", "./results/base/",
+                "--data_name", "cifar100",
+                "--num_class", "100",
+                "--net_name", "resnet110",
+                "--note", "base-c100-r110"
+            ]
+        }
+    ]
+}

@@ -7,19 +7,20 @@ import torch.nn.functional as F
 
 
 class FT(nn.Module):
-	'''
-	araphrasing Complex Network: Network Compression via Factor Transfer
-	http://papers.nips.cc/paper/7541-paraphrasing-complex-network-network-compression-via-factor-transfer.pdf
-	'''
-	def __init__(self):
-		super(FT, self).__init__()
+    """
+    araphrasing Complex Network: Network Compression via Factor Transfer
+    http://papers.nips.cc/paper/7541-paraphrasing-complex-network-network-compression-via-factor-transfer.pdf
+    """
 
-	def forward(self, factor_s, factor_t):
-		loss = F.l1_loss(self.normalize(factor_s), self.normalize(factor_t))
+    def __init__(self):
+        super(FT, self).__init__()
 
-		return loss
+    def forward(self, factor_s, factor_t):
+        loss = F.l1_loss(self.normalize(factor_s), self.normalize(factor_t))
 
-	def normalize(self, factor):
-		norm_factor = F.normalize(factor.view(factor.size(0),-1))
+        return loss
 
-		return norm_factor
+    def normalize(self, factor):
+        norm_factor = F.normalize(factor.view(factor.size(0), -1))
+
+        return norm_factor

@@ -12,7 +12,7 @@ I will update this repo regularly with new KD methods. If there some basic metho
   :---- | ----- | :----: | :----:
   Baseline | basic model with softmax loss | — | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/train_base.py)
   Logits   | mimic learning via regressing logits | [paper](http://papers.nips.cc/paper/5484-do-deep-nets-really-need-to-be-deep.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/logits.py)
-  ST       | soft target | [paper](https://arxiv.org/pdf/1503.02531.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/st.py)
+  [ST](https://github.com/corner430/Knowledge-Distillation-Zoo/tree/master/paper/Distilling-the-Knowledge-in-a-Neural-Network.md)       | soft target | [paper](https://arxiv.org/pdf/1503.02531.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/st.py)
   AT       | attention transfer | [paper](https://arxiv.org/pdf/1612.03928.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/at.py)
   Fitnet   | hints for thin deep nets | [paper](https://arxiv.org/pdf/1412.6550.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/fitnet.py)
   NST      | neural selective transfer | [paper](https://arxiv.org/pdf/1707.01219.pdf) | [code](https://github.com/AberHu/Knowledge-Distillation-Zoo/blob/master/kd_losses/nst.py)
