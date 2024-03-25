@@ -52,8 +52,11 @@ def transform_time(s):
 
 
 def save_checkpoint(state, is_best, save_root):
+    # 使用 os.path.join 将 save_root 和 "checkpoint.pth.tar" 连接成一个完整的文件路径
     save_path = os.path.join(save_root, "checkpoint.pth.tar")
+    # 使用 torch.save 将 state 保存到 save_path 指定的文件中
     torch.save(state, save_path)
+    # 如果 is_best 为 True，则将 save_path 文件复制到 "model_best.pth.tar"
     if is_best:
         best_save_path = os.path.join(save_root, "model_best.pth.tar")
         shutil.copyfile(save_path, best_save_path)

@@ -31,6 +31,20 @@
                 "--net_name", "resnet110",
                 "--note", "base-c100-r110"
             ]
+        },
+        {
+            "name": "test-c100-r20",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--save_root", "./results/base/",
+                "--data_name", "cifar100",
+                "--num_class", "100",
+                "--net_name", "resnet20",
+                "--note", "test-c100-r20"
+            ]
         }
     ]
 }
