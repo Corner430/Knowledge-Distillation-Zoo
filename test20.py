@@ -10,6 +10,7 @@ import numpy as np
 
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 import torchvision.transforms as transforms
@@ -185,11 +186,12 @@ def main():
         pin_memory=True,
     )
 
-    weights_with_path = get_weights_with_path(net)
+    resetter = WeightResetter(net)
 
     for epoch in range(1, args.epochs + 1):
         net.load_state_dict(checkpoint["net"])
-        reset_weight_at_index(net, weights_with_path, epoch - 1)
+        resetter.reset_weight_at_index(index=epoch, reset_method="xavier_uniform_")
+        # resetter.reset_weight_at_index(index=epoch, reset_method="normal_")
 
         # evaluate on testing set
         logging.info("Testing the models......")
@@ -208,59 +210,69 @@ def main():
             save_path,
         )
 
-def get_attribute(net, attribute_path):
-    parts = attribute_path.split('.')
-    for part in parts:
-        if '[' in part and ']' in part:
-            attr, index = part.split('[')[0], int(part.split('[')[1].split(']')[0])
-            net = getattr(net, attr)[index]
-        else:
-            net = getattr(net, part)
-    return net
+class WeightResetter:
+    def __init__(self, net):
+        # 初始化时，接收一个神经网络模型，并获取其所有权重及路径
+        self.net = net
+        self.weights_with_path = self.get_weights_with_path(self.net)
 
-def reset_weight_at_index(net, weights_with_path, index):
-    if index >= len(weights_with_path):
-        print("Index out of range")
-        return
-
-    # 获取指定索引位置处的权重张量及其路径
-    weight_path, weight_tensor = weights_with_path[index]
-
-    # 重新初始化权重张量
-    if isinstance(net, nn.DataParallel):
-        # 使用 getattr 函数获取 net.module 中名为 weight_path 的属性，这个属性应该是一个权重张量
-        # 使用 nn.init.xavier_uniform_ 函数对这个权重张量进行 Xavier 均匀初始化
-        # 这个函数会返回一个新的张量，这个张量的值是从均匀分布 U(-sqrt(6/(fan_in + fan_out)), sqrt(6/(fan_in + fan_out))) 中抽取的，其中 fan_in 和 fan_out 是权重张量的输入和输出单元数
-        # 最后，将这个新的张量赋值给原来的权重张量
-        get_attribute(net.module, weight_path).data = nn.init.xavier_uniform_(weight_tensor.data)
-    else:
-        get_attribute(net, weight_path).data = nn.init.xavier_uniform_(weight_tensor.data)
-
-
-def get_weights_with_path(net):
-    # 初始化一个空列表，用于存储权重和路径
-    weights_list = []
-
-    # 定义一个递归函数，用于遍历模型的所有子模块
-    def recursive_get_weights(module, path):
-        # 遍历当前模块的所有子模块
-        for name, child_module in module.named_children():
-            # 如果路径不为空，则在路径后面添加当前子模块的名称，否则，路径就是当前子模块的名称
-            new_path = f"{path}[{name}]" if path in ["res1", "res2", "res3"] else f"{path}.{name}" if path else name
-            # 如果当前子模块是卷积层或全连接层，则将其路径和权重添加到列表中
-            if isinstance(child_module, (nn.Conv2d, nn.Linear)):
-                weights_list.append((new_path, child_module.weight))
+    def get_attribute(self, module, attribute_path):
+        # 该函数用于获取模型中的特定属性，支持嵌套属性和列表索引
+        parts = attribute_path.split('.')
+        for part in parts:
+            if '[' in part and ']' in part:
+                attr, index = part.split('[')[0], int(part.split('[')[1].split(']')[0])
+                module = getattr(module, attr)[index]
             else:
-                # 如果当前子模块不是卷积层或全连接层，则递归遍历其子模块
-                recursive_get_weights(child_module, new_path)
+                module = getattr(module, part)
+        return module
 
-    # 如果模型是并行模型，则获取其实际模型，否则，直接使用模型
-    actual_model = net.module if isinstance(net, nn.DataParallel) else net
-    # 调用递归函数，开始遍历模型的所有子模块
-    recursive_get_weights(actual_model, "")
+    def reset_weight_at_index(self, index, reset_method='xavier_uniform_'):
+        # 该函数用于重置指定索引位置的权重，支持不同的初始化方法
+        if index >= len(self.weights_with_path):
+            print("Index out of range")
+            return
 
-    # 返回包含所有权重和路径的列表
-    return weights_list
+        # 获取指定索引位置处的权重张量及其路径
+        weight_path, weight_tensor = self.weights_with_path[index]
+
+        # 重新初始化权重张量
+        if isinstance(self.net, nn.DataParallel):
+            module = self.net.module
+        else:
+            module = self.net
+        weight_to_reset = self.get_attribute(module, weight_path)
+
+        if reset_method == 'normal_':
+            # 使用正态分布进行初始化，均值为当前权重的均值，方差为当前权重的方差
+            with torch.no_grad():
+                weight_to_reset.weight.data.normal_(mean=weight_tensor.data.mean(), std=weight_tensor.data.std())
+        else:
+            # 使用原来的方法进行初始化
+            reset_func = getattr(init, reset_method)
+            weight_to_reset.weight.data = reset_func(weight_tensor.data)
+
+    def get_weights_with_path(self, module):
+        # 该函数用于获取模型中所有权重及其路径
+        weights_list = []
+
+        def recursive_get_weights(module, path):
+            # 递归遍历模型的所有子模块
+            for name, child_module in module.named_children():
+                # 根据路径是否为 "res1"、"res2" 或 "res3"，生成新的路径
+                new_path = f"{path}[{name}]" if path in ["res1", "res2", "res3"] else f"{path}.{name}" if path else name
+                # 如果当前子模块是卷积层或全连接层，则将其路径和权重添加到列表中
+                if isinstance(child_module, (nn.Conv2d, nn.Linear)):
+                    weights_list.append((new_path, child_module.weight))
+                else:
+                    # 如果当前子模块不是卷积层或全连接层，则递归遍历其子模块
+                    recursive_get_weights(child_module, new_path)
+
+        # 如果模型是并行模型，则获取其实际模型，否则，直接使用模型
+        actual_model = module.module if isinstance(module, nn.DataParallel) else module
+        recursive_get_weights(actual_model, "")
+
+        return weights_list
 
 
 def test(test_loader, net, criterion):
