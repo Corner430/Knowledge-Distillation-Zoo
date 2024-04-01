@@ -45,6 +45,41 @@
                 "--net_name", "resnet20",
                 "--note", "test-c100-r20"
             ]
-        }
+        },
+        {
+            "name": "test-c100-r110",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--save_root", "./results/base/",
+                "--data_name", "cifar100",
+                "--num_class", "100",
+                "--net_name", "resnet110",
+                "--note", "test-c100-r110",
+                "--checkpoint_path", "./results/base/base-c100-r110/model_best.pth.tar"
+            ]
+        },
+        {
+            "name": "at-c100-r110-r20",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "--save_root", "./results/at/",
+                "--t_model", "./results/base/base-c100-r110/model_best.pth.tar",
+                "--s_init", "./results/base/base-c100-r20/initial_r20.pth.tar",
+                "--data_name", "cifar100",
+                "--num_class", "100",
+                "--t_name", "resnet110",
+                "--s_name", "resnet20",
+                "--kd_mode", "at",
+                "--lambda_kd", "1000.0",
+                "--p", "2.0",
+                "--note", "at-c100-r110-r20"
+            ]
+        },
     ]
 }

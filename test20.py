@@ -33,6 +33,9 @@ parser.add_argument(
 parser.add_argument(
     "--img_root", type=str, default="./datasets", help="path name of image dataset"
 )
+parser.add_argument(
+    "--checkpoint_path", type=str, default="/home/corner/Knowledge-Distillation-Zoo/results/base/test-c100-r20/initial_r20.pth.tar", help="path to load checkpoint"
+)
 
 # training hyper parameters
 parser.add_argument(
@@ -112,9 +115,7 @@ def main():
 
     # 加载模型
     net = define_tsnet(name=args.net_name, num_class=args.num_class, cuda=args.cuda)
-    checkpoint = torch.load(
-        "/home/corner/Knowledge-Distillation-Zoo/results/base/test-c100-r20/initial_r20.pth.tar"
-    )
+    checkpoint = torch.load(args.checkpoint_path)
     net.load_state_dict(checkpoint["net"])
     logging.info("%s", net)
     logging.info("param size = %fMB", count_parameters_in_MB(net))
@@ -190,8 +191,8 @@ def main():
 
     for epoch in range(1, args.epochs + 1):
         net.load_state_dict(checkpoint["net"])
-        resetter.reset_weight_at_index(index=epoch, reset_method="xavier_uniform_")
-        # resetter.reset_weight_at_index(index=epoch, reset_method="normal_")
+        # resetter.reset_weight_at_index(index=epoch, reset_method="xavier_uniform_")
+        resetter.reset_weight_at_index(index=epoch, reset_method="normal_")
 
         # evaluate on testing set
         logging.info("Testing the models......")

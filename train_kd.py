@@ -143,12 +143,16 @@ def main():
 
     logging.info("----------- Network Initialization --------------")
     snet = define_tsnet(name=args.s_name, num_class=args.num_class, cuda=args.cuda)
+
+    # load pretrained model
     checkpoint = torch.load(args.s_init)
     load_pretrained_model(snet, checkpoint["net"])
     logging.info("Student: %s", snet)
     logging.info("Student param size = %fMB", count_parameters_in_MB(snet))
 
     tnet = define_tsnet(name=args.t_name, num_class=args.num_class, cuda=args.cuda)
+    
+    # load pretrained model
     checkpoint = torch.load(args.t_model)
     load_pretrained_model(tnet, checkpoint["net"])
     tnet.eval()

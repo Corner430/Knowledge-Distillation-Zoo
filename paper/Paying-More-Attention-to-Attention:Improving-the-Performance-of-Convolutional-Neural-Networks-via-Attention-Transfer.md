@@ -1,23 +1,14 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import division
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+- **`AT`的目的是让student的attention map和teacher的attention map尽量一致**
+- 多少层并不决定上限，多少 parameters 才决定上限
+- 底盘要稳，才可以拟合 spatial map
+- 作者做了一个隐形假设，就是 隐藏层激活之后的神经元的绝对值之间是很大联系的
 
+![20240401214918](https://cdn.jsdelivr.net/gh/Corner430/Picture1/images/20240401214918.png)
 
-"""
-AT with sum of absolute values with power p
-"""
+![20240401214957](https://cdn.jsdelivr.net/gh/Corner430/Picture1/images/20240401214957.png)
 
-
+```python
 class AT(nn.Module):
-    """
-    Paying More Attention to Attention: Improving the Performance of Convolutional
-    Neural Netkworks wia Attention Transfer
-    https://arxiv.org/pdf/1612.03928.pdf
-    """
-
     def __init__(self, p):
         super(AT, self).__init__()
         self.p = p
@@ -35,5 +26,5 @@ class AT(nn.Module):
         norm = torch.norm(am, dim=(2, 3), keepdim=True)
         # 将张量 am 的每个元素除以张量 norm 的对应元素加上一个小的常数 eps
         am = torch.div(am, norm + eps)
-
         return am
+```

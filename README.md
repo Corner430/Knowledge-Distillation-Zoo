@@ -661,3 +661,7 @@ If you employ the listed KD methods in your research, please cite the correspond
     - **对于 $L_{soft}$ 的相对权重，可以通过打印中间梯度来确定一下，这个超参非常重要。**
     - **可以动态调整学习率**
     - 可以避免 teacher 的错误，或者当无法 match teacher 的输出时，可以避免 student 的错误
+- [AT: Paying More Attention to Attention: Improving the Performance of Convolutional Neural Networks via Attention Transfer](https://github.com/corner430/Knowledge-Distillation-Zoo/tree/master/paper/Paying-More-Attention-to-Attention:Improving-the-Performance-of-Convolutional-Neural-Networks-via-Attention-Transfer.md)
+   - **`AT`的目的是让student的attention map和teacher的attention map尽量一致**
+   - 多少层并不决定上限，多少 parameters 才决定上限
+   - 底盘要稳，才可以拟合 spatial map
